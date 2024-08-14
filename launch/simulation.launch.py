@@ -11,7 +11,7 @@ robot_data = {
     "package_name": "franka_moveit_config",
     "robot_name": "panda",
     "move_group_name": "panda_arm",
-    "target_link_name": "panda_link8",
+    "target_link_name": "panda_tip",
     "base_link_name": "panda_link0",
 }
 
