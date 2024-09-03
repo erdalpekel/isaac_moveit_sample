@@ -11,9 +11,23 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(rosgraph_msgs REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(isaac_moveit_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_eigen REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(Eigen3 REQUIRED NO_MODULE)
 
 add_executable(clock src/ClockPublisher.cpp)
 ament_target_dependencies(clock rclcpp rosgraph_msgs)
+
+add_executable(motion_planner src/MotionPlanner.cpp)
+target_include_directories(motion_planner 
+PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+          $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(motion_planner rclcpp moveit_ros_planning_interface isaac_moveit_msgs tf2 tf2_geometry_msgs tf2_ros tf2_eigen Eigen3)
 
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
@@ -21,6 +35,7 @@ install(DIRECTORY launch
 
 install(TARGETS 
   clock
+  motion_planner
   DESTINATION lib/${PROJECT_NAME})
 
 if(BUILD_TESTING)

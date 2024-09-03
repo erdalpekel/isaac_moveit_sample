@@ -6,6 +6,9 @@ from launch.actions import (
 )
 from moveit_configs_utils import MoveItConfigsBuilder
 from srdfdom.srdf import SRDF
+from ament_index_python import get_package_share_directory
+import os
+import yaml
 
 robot_data = {
     "package_name": "franka_moveit_config",
@@ -142,9 +145,39 @@ def launch_robot(context):
         )
     )
 
+    kinematics_yaml = load_yaml(robot_data["package_name"], "config/kinematics.yaml")
+    actions_robot_namespace.append(
+        Node(
+            package="isaac_moveit_sample",
+            executable="motion_planner",
+            parameters=[
+                kinematics_yaml,
+                {
+                    "move_group_name": robot_data["move_group_name"],
+                    "target_link_name": robot_data["target_link_name"],
+                    "base_link_name": robot_data["base_link_name"],
+                },
+                {"use_sim_time": True},
+            ],
+        )
+    )
+
     actions.append(GroupAction(actions=actions_robot_namespace))
 
     return actions
+
+
+def load_yaml(package_name, file_path):
+    package_path = get_package_share_directory(package_name)
+    absolute_file_path = os.path.join(package_path, file_path)
+
+    try:
+        with open(absolute_file_path, "r") as file:
+            return yaml.safe_load(file)
+    except (
+        EnvironmentError
+    ):  # parent of IOError, OSError *and* WindowsError where available
+        return None
 
 
 def generate_launch_description():
